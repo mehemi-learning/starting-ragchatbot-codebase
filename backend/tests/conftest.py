@@ -55,3 +55,22 @@ def mock_anthropic_response(stop_reason, content_blocks):
 def mock_vector_store():
     """MagicMock of VectorStore for use in search tool tests."""
     return MagicMock()
+
+
+@pytest.fixture
+def mock_rag_system():
+    """Pre-configured MagicMock representing a RAGSystem instance.
+
+    Suitable as a drop-in replacement for app.rag_system in API tests.
+    Defaults cover the happy path; individual tests can override return values.
+    """
+    mock = MagicMock()
+    mock.query.return_value = ("Test answer", ["Course A - Lesson 1"])
+    mock.get_course_analytics.return_value = {
+        "total_courses": 2,
+        "course_titles": ["Course A", "Course B"],
+    }
+    mock.session_manager = MagicMock()
+    mock.session_manager.create_session.return_value = "test-session-id"
+    mock.add_course_folder.return_value = (0, 0)
+    return mock
