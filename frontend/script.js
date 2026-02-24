@@ -5,7 +5,7 @@ const API_URL = '/api';
 let currentSessionId = null;
 
 // DOM elements
-let chatMessages, chatInput, sendButton, totalCourses, courseTitles, newChatButton;
+let chatMessages, chatInput, sendButton, totalCourses, courseTitles, newChatButton, themeToggle;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -16,7 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
     totalCourses = document.getElementById('totalCourses');
     courseTitles = document.getElementById('courseTitles');
     newChatButton = document.getElementById('newChatButton');
-    
+    themeToggle = document.getElementById('themeToggle');
+
+    // Restore saved theme before first paint
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+    }
+
     setupEventListeners();
     createNewSession();
     loadCourseStats();
@@ -34,6 +41,9 @@ function setupEventListeners() {
     // New chat button
     newChatButton.addEventListener('click', createNewSession);
 
+    // Theme toggle
+    themeToggle.addEventListener('click', toggleTheme);
+
     // Suggested questions
     document.querySelectorAll('.suggested-item').forEach(button => {
         button.addEventListener('click', (e) => {
@@ -44,6 +54,26 @@ function setupEventListeners() {
     });
 }
 
+
+// Theme Functions
+function toggleTheme() {
+    // Enable cross-element transitions for the duration of the switch
+    document.body.classList.add('theme-transition');
+
+    const html = document.documentElement;
+    const isLight = html.getAttribute('data-theme') === 'light';
+
+    if (isLight) {
+        html.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'dark');
+    } else {
+        html.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+    }
+
+    // Remove transition class after animation completes
+    setTimeout(() => document.body.classList.remove('theme-transition'), 300);
+}
 
 // Chat Functions
 async function sendMessage() {
